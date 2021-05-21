@@ -24,8 +24,13 @@ INCDIR ?= $(PREFIX)/include
 
 # Prefix for dpdk
 RTE_SDK ?= /usr/
+# Mellanox support
+MLX5 := n
 # mpdts to compile
 DPDK_PMDS ?= ixgbe i40e tap virtio
+ifeq ($(MLX5), y)
+		DPDK_PMDS += mlx5
+endif
 
 DPDK_CPPFLAGS += -I$(RTE_SDK)/include -I$(RTE_SDK)/include/dpdk \
   -I$(RTE_SDK)/include/x86_64-linux-gnu/dpdk/
@@ -53,6 +58,9 @@ DPDK_LDLIBS+= \
   -Wl,--no-whole-archive \
   -ldl \
   $(EXTRA_LIBS_DPDK)
+ifeq ($(MLX5), y)
+		DPDK_LDLIBS += -lmlx5 -libverbs
+endif
 
 
 ##############################################################################
