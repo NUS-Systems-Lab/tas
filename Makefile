@@ -22,45 +22,8 @@ INCDIR ?= $(PREFIX)/include
 ##############################################################################
 # DPDK configuration
 
-# Prefix for dpdk
-RTE_SDK ?= /usr/
-# Mellanox support
-MLX5 := n
-# mpdts to compile
-DPDK_PMDS ?= ixgbe i40e tap virtio
-ifeq ($(MLX5), y)
-		DPDK_PMDS += mlx5
-endif
-
-DPDK_CPPFLAGS += -I$(RTE_SDK)/include -I$(RTE_SDK)/include/dpdk \
-  -I$(RTE_SDK)/include/x86_64-linux-gnu/dpdk/
-DPDK_LDFLAGS+= -L$(RTE_SDK)/lib/
-DPDK_LDLIBS+= \
-  -Wl,--whole-archive \
-   $(addprefix -lrte_pmd_,$(DPDK_PMDS)) \
-  -lrte_eal \
-  -lrte_mempool \
-  -lrte_mempool_ring \
-  -lrte_hash \
-  -lrte_ring \
-  -lrte_kvargs \
-  -lrte_ethdev \
-  -lrte_mbuf \
-  -lnuma \
-  -lrte_bus_pci \
-  -lrte_pci \
-  -lrte_cmdline \
-  -lrte_timer \
-  -lrte_net \
-  -lrte_kni \
-  -lrte_bus_vdev \
-  -lrte_gso \
-  -Wl,--no-whole-archive \
-  -ldl \
-  $(EXTRA_LIBS_DPDK)
-ifeq ($(MLX5), y)
-		DPDK_LDLIBS += -lmlx5 -libverbs
-endif
+DPDK_CPPFLAGS += $(shell pkg-config --cflags libdpdk)
+DPDK_LDLIBS+= $(shell pkg-config --libs libdpdk)
 
 
 ##############################################################################
